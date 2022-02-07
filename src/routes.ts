@@ -11,7 +11,7 @@ router.get('/', (req: Request, res: Response) => {
 })
 
 router.get('/auth/google', passport.authenticate('google', {
-  scope: ['profile']
+  scope: ['profile', 'email']
 }))
 
 router.get('/logout', (req: Request, res: Response) => {
@@ -22,7 +22,7 @@ router.get('/logout', (req: Request, res: Response) => {
 router.get('/oauth2/redirect/google',
   passport.authenticate('google', { failureRedirect: '/', failureMessage: true }),
   (req: Request, res: Response) => {
-    res.redirect('/');
+    res.redirect('/api');
   });
 
 router.post('/users', (req: Request, res: Response) => createAccountController.handle(req, res))
