@@ -18,12 +18,12 @@ export class PassportAuth {
     return new Strategy({
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.BASE_URL + 'oauth2/redirect/google',
+      callbackURL: process.env.BASE_URL + 'api/oauth2/redirect/google',
       passReqToCallback: true
     },
       (req: Request, accessToken: string, refresToken: string, profile: Profile, done) => {
         try {
-          // console.log('profile:', profile)
+          console.log('profile:', profile)
           const user: Express.User = {
             name: profile._json.given_name,
             email: profile._json.email,
