@@ -1,12 +1,16 @@
 import { Account } from "../../entities/Account";
+import { JwtProvider } from "../../providers/jwt-provider";
 import { Hasher } from "../../providers/protocols/hasher";
 import { AccountRepository } from "../../repositories/protocols/accountRepository";
+import { UpdateAccessTokenRepository } from "../../repositories/protocols/updateAcessTokenRepository";
 import { CreateAccountRequest } from "./CreateAccountDTO";
 
 export class CreateAccountUseCase {
   constructor(
     private accountRepository: AccountRepository,
+    private updateAcessTokenRepository: UpdateAccessTokenRepository,
     private hasher: Hasher,
+    private jwtProvider: JwtProvider
   ) { }
 
   async execute(data: CreateAccountRequest) {
@@ -26,7 +30,9 @@ export class CreateAccountUseCase {
     const hashedPassword = await this.hasher.hash(data.password)
     const user = new Account({ ...data, password: hashedPassword });
 
-    await this.accountRepository.save(user);
+    const id = await this.accountRepository.save(user);
+    const token = await this.jwtProvider.encrypt(id, user.email);
 
+    await this.updateAcessTokenRepository.updateAccessToken(id, token)
   }
 }
