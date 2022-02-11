@@ -1,16 +1,12 @@
 import { Account } from "../../entities/Account";
-import { JwtProvider } from "../../providers/jwt-provider";
-import { Hasher } from "../../providers/protocols/hasher";
+import { AuthenticationProvider } from "../../providers/authentication-provider";
 import { AccountRepository } from "../../repositories/protocols/accountRepository";
-import { UpdateAccessTokenRepository } from "../../repositories/protocols/updateAcessTokenRepository";
 import { CreateAccountRequest } from "./CreateAccountDTO";
 
 export class CreateAccountUseCase {
   constructor(
     private accountRepository: AccountRepository,
-    private updateAcessTokenRepository: UpdateAccessTokenRepository,
-    private hasher: Hasher,
-    private jwtProvider: JwtProvider
+    private authenticationProvider: AuthenticationProvider,
   ) { }
 
   async execute(data: CreateAccountRequest) {
@@ -26,13 +22,13 @@ export class CreateAccountUseCase {
       throw new Error('User already exists.');
     }
 
+    const user = new Account(data);
+    await this.accountRepository.save(user);
+    const authenticationModel = await this.authenticationProvider.auth(user.email)
 
-    const hashedPassword = await this.hasher.hash(data.password)
-    const user = new Account({ ...data, password: hashedPassword });
-
-    const id = await this.accountRepository.save(user);
-    const token = await this.jwtProvider.encrypt(id, user.email);
-
-    await this.updateAcessTokenRepository.updateAccessToken(id, token)
+    if (!authenticationModel) {
+      throw new Error('Error generating token.');
+    }
+    return authenticationModel
   }
 }

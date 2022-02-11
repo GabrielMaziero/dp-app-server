@@ -8,18 +8,17 @@ export class CreateAccountController implements Controller {
   ) { }
 
   async handle(request: Request, response: Response): Promise<Response> {
-    const { name, email, password, gender, birthday } = request.body;
+    const { name, email, gender, birthday } = request.body;
 
     try {
-      await this.createAccountUseCase.execute({
+      const result = await this.createAccountUseCase.execute({
         name,
         email,
         gender,
         birthday,
-        password
       })
 
-      return response.status(201).send();
+      return response.status(201).send(result);
     } catch (err) {
       return response.status(400).json({
         message: err.message || 'Unexpected error.'

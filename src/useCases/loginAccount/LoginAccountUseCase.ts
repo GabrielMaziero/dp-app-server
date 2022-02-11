@@ -1,12 +1,12 @@
 import { Account } from "../../entities/Account";
-import { HashComparer } from "../../providers/protocols/hasher-comparer";
+import { AuthenticationProvider } from "../../providers/authentication-provider";
 import { AccountRepository } from "../../repositories/protocols/accountRepository";
 import { LoginAccountRequest } from "./LoginAccountDTO";
 
 export class LoginAccountUseCase {
   constructor(
     private accountRepository: AccountRepository,
-    private hasherComparer: HashComparer,
+    private authenticationProvider: AuthenticationProvider,
   ) { }
 
   async execute(data: LoginAccountRequest): Promise<Account> {
@@ -19,10 +19,8 @@ export class LoginAccountUseCase {
     if (!account) {
       throw new Error('User not exists.');
     }
-    const isValid = await this.hasherComparer.compare(data.password, account.password)
-    if (!isValid) {
-      throw new Error('password invalid.');
-    }
+    
+    await this.authenticationProvider.auth(account.email)
 
     return account
   }

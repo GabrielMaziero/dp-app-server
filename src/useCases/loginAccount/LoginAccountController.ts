@@ -8,13 +8,10 @@ export class LoginAccountController implements Controller {
   ) { }
 
   async handle(request: Request, response: Response): Promise<Response> {
-    const { email, password } = request.body;
+    const { email } = request.body;
 
     try {
-      const res = await this.loginAccountUseCase.execute({
-        email,
-        password
-      })
+      const res = await this.loginAccountUseCase.execute({ email })
 
       return response.status(201).send(res);
     } catch (err) {
