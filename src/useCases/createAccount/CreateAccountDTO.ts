@@ -3,5 +3,4 @@ export interface CreateAccountRequest {
   email: string
   gender?: string
   birthday?: string
-  password: string
 }
