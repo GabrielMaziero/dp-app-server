@@ -22,7 +22,11 @@ export class CreateAccountUseCase {
       throw new Error('User already exists.');
     }
 
-    const user = new Account(data);
+    const user = new Account();
+    user.name = data.name
+    user.email = data.email
+    user.birthday = data.birthday
+    user.gender = data.gender
     await this.accountRepository.save(user);
     const authenticationModel = await this.authenticationProvider.auth(user.email)
 

@@ -1,7 +1,8 @@
 export interface AccountModel{
-  id: string;
+  id: number;
   name: string;
   email: string;
   gender?: string;
   birthday?: string;
+  acessToken?: string;
 }

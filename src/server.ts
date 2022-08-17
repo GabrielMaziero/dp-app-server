@@ -1,8 +1,8 @@
+import "reflect-metadata";
 import app from './app';
-import { MongoHelper } from './config/database';
-import 'dotenv/config'
+import { AppDataSource } from "./config/database";
 
-MongoHelper.connect(process.env.MONGO_URL).then(async () => {
+AppDataSource.initialize().then(async () => {
   app.listen(process.env.PORT, () => console.log(`Server running at http://localhost:${process.env.PORT}`))
 })
   .catch(console.error)

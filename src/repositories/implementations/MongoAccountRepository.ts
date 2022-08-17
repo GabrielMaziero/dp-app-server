@@ -1,31 +1,31 @@
-import { MongoHelper } from "../../config/database";
 import { Account } from "../../entities/Account";
 import { AccountRepository } from "../protocols/accountRepository";
 import { UpdateAccessTokenRepository } from "../protocols/updateAcessTokenRepository";
-import { ObjectId } from 'mongodb';
 import { AccountModel } from "../interfaces/account-model";
+import { AppDataSource } from "../../config/database";
 
 
 export class MongoAccountRepository implements AccountRepository, UpdateAccessTokenRepository {
   async save(account: Account): Promise<AccountModel> {
-    const accountCollection = await MongoHelper.getCollection('accounts');
-    const result = await accountCollection.insertOne(account)
-    return MongoHelper.map(result)
+    const db = AppDataSource.getRepository(Account);
+    return await db.save(account);
   }
 
   async findByEmail(email: string): Promise<AccountModel> {
-    const accountCollection = await MongoHelper.getCollection('accounts');
-    const account = await accountCollection.findOne({ email })
-    return account && MongoHelper.map(account)
+    const db = AppDataSource.getRepository(Account);
+    return db.findOneBy({ email })
   }
 
-  async updateAccessToken(id: string, token: string): Promise<void> {
-    const accountCollection = await MongoHelper.getCollection('accounts')
-    await accountCollection.updateOne({ _id: new ObjectId(id) }, {
-      $set: {
-        accessToken: token
-      }
-    })
+  async updateAccessToken(id: number, token: string): Promise<void> {
+    const db = AppDataSource.getRepository(Account);
+    const updateToken = await db.findOneBy({ id });
+    updateToken.accessToken = token
+    await db.save(updateToken);
+    // await accountCollection.updateOne({ _id: new ObjectId(id) }, {
+    //   $set: {
+    //     accessToken: token
+    //   }
+    // })
   }
 
 }
